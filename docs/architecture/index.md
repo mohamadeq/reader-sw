@@ -23,7 +23,7 @@ It is presumed that each *Reader Type* will have a fundamentally different busin
 
 A Core will use one or more Modules. Module is a piece of code, usually run as a thread that Does One Thing and Does It Well. Modules are stored in folder `src/modules`. Communication with modules will be done using [ChibiOS Mailboxes](http://www.chibios.org/dokuwiki/doku.php?id=chibios:book:kernel_mailboxes). Each *Module* has a single mailbox, (called *Module Inbox*), to which the *Core* can send messages. A *Core* has also its *Core Inbox*, to which each *Module* sends messages. A module can communicate only with the core, not with other modules.
 
-Some modules can implement common **Module Interface** (`/src/module-interfaces`) and therefore can be interchangeable. Therefore there may be more combinations of the same *Core* but different set of *Modules*, compiled for a different hardware board. This combination is called **Reader Flavour**. One *Reader Type* can have different flavours, which provide the same basic functionality but on different hardware. This way a tremendous code reusability can be achieved and all generations of evolving hardware can still be supported.
+Some modules can implement common **Module Interface** (`src/module-interfaces`) and therefore can be interchangeable. Therefore there may be more combinations of the same *Core* but different set of *Modules*, compiled for a different hardware board. This combination is called **Reader Flavour**. One *Reader Type* can have different flavours, which provide the same basic functionality but on different hardware. This way a tremendous code reusability can be achieved and all generations of evolving hardware can still be supported.
 
 ### Messages
 
@@ -80,9 +80,9 @@ Module Interfaces
 
 A module interface is a header file formally defining and documenting message numbers and message formats that can be used to communicate with the given module. Each module may implement one or more of such interfaces.
 
-Each message is a pointer to the following structure:
-
 ```eval_rst
+
+.. doxygenfile:: src/module-interfaces.h
 
 .. toctree::
     :maxdepth: 2

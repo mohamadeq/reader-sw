@@ -13,6 +13,7 @@ Table of contents
    architecture/index
    testing
    rfid_stack/index
+   reader-controller-protocol/index
 
 .. Indices and tables
 .. ==================
