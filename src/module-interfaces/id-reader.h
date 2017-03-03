@@ -127,7 +127,7 @@
 
 typedef struct {
     message_header_t header;
-    char *error_string;     /**< String describing the error. Core may log it.                    */
+    char error_string[];    /**< null-terminated string describing the error. Core may log it.    */
 } msg_id_reader_fault_t;
 
 /** @} ------------------------------------------------------------------------------------------ */
@@ -148,14 +148,16 @@ typedef struct {
  */
 #define MSG_ID_READER_RESULT            6
 
+// Warning: This structure is shared with
+//   - reader-proto, message #MSG_READER_PROTO_SEND_ID
 typedef struct {
     message_header_t header;
 
     struct id_t {
         uint8_t id_length;
-        uint8_t *id_data;
-    } *ids;                 /**< Array of id_t representing IDs of detected cards                 */
-} msg_id_reader_result;
+        uint8_t id_data[10];
+    } ids[];                /**< Array of id_t representing IDs of detected cards                 */
+} msg_id_reader_result_t;
 
 /** @} ------------------------------------------------------------------------------------------ */
 
