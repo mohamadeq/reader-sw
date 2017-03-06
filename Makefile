@@ -293,6 +293,20 @@ debugl: build/deadlock-reader.elf
 
 #
 #
+###############################################################################
+
+
+###############################################################################
+# Start of gpg signing helper commands
+#
+
+%.sig: %
+	gpg --output $@ --detach-sig $<
+
+sign: build/deadlock-reader.bin.sig build/deadlock-reader.elf.sig
+
+#
+#
 ##############################################################################
 
 ##############################################################################
@@ -353,8 +367,6 @@ $(TEST_RESULTS)%.result: $(TEST_BUILD)%.out
 RESULTS = $(patsubst $(TEST_PATH)%.c,$(TEST_RESULTS)%.result,$(TEST_CSRC))
 TEST_EXECS = $(patsubst $(TEST_RESULTS)%.result,$(TEST_BUILD)%.out,$(RESULTS))
 
-.PHONY: test run-tests clean-tests print_tcsrc
-
 run-tests: $(TEST_BUILD_PATHS) $(TEST_EXECS) $(RESULTS)
 	@echo
 	@echo "----- SUMMARY -----"
@@ -378,3 +390,5 @@ print_tcsrc:
 #
 #
 ##############################################################################
+
+.PHONY: test run-tests clean-tests print_tcsrc sign
