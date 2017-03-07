@@ -6,7 +6,7 @@ before_install:
 install:
   - cd docs && virtualenv _venv && source _venv/bin/activate && pip install -r requirements.txt && cd ..
 script:
-  - make clean && make
+  - for i in src/flavours/*; do FLAVOUR=${i#src/flavours/} make clean && FLAVOUR=${i#src/flavours/} make && FLAVOUR=${i#src/flavours/} make clean; done
   - cd docs && make html && cd ..
   - make test
-  - make clean && DEBUG_BUILD=no make
+  - for i in src/flavours/*; do FLAVOUR=${i#src/flavours/} make clean && FLAVOUR=${i#src/flavours/} DEBUG_BUILD=no make && FLAVOUR=${i#src/flavours/} make clean; done

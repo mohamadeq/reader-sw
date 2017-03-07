@@ -1,0 +1,29 @@
+##############################################################################
+# Project, sources and paths
+#
+
+# Board this flavour is for
+
+BOARD_FOLDER = $(DEADLOCK_BOARDS)/reader-revA
+# TODO
+# reader-revA board actually shoud have STM32F052 MCU, this is for development and
+# not final!
+LDSCRIPT= $(STARTUPLD)/STM32F072xB.ld
+FW_FLASH_ADDRESS= 0x08000000
+
+MCU  = cortex-m0
+
+# Core this flavour uses
+
+DEADLOCK_USED_CORE = $(DEADLOCK_CORES)/basic-isic-ID-reader
+
+# Modules this flavour uses
+
+DEADLOCK_USED_MODULES = $(DEADLOCK_MODULES)/iso14443-3-uid-reader             \
+                        $(DEADLOCK_MODULES)/reader-proto-v1                   \
+                        $(DEADLOCK_MODULES)/reader-revA-ui
+
+
+#
+#
+##############################################################################

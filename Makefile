@@ -7,6 +7,10 @@ ifeq ($(DEBUG_BUILD),)
 	DEBUG_BUILD := yes
 endif
 
+ifeq ($(FLAVOUR),)
+  FLAVOUR = basic-isic-ID-reader-revA
+endif
+
 # Compiler options here.
 ifeq ($(USE_OPT),)
   ifeq ($(DEBUG_BUILD),yes)
@@ -57,8 +61,14 @@ endif
 
 # If enabled, this option makes the build process faster by not compiling
 # modules not used in the current configuration.
+#
+# It is disabled for Deadlock because ChibiOS makefiles have hardcoded paths
+# to `chconf.h` and `halconf.h`, but we want them to be potentially different
+# for each flavour.
+# This setting only makes compilation faster, it does not result in larger
+# firmware file. And we don't care about compilation speed.
 ifeq ($(USE_SMART_BUILD),)
-  USE_SMART_BUILD = yes
+  USE_SMART_BUILD = no
 endif
 
 #
@@ -89,30 +99,20 @@ endif
 # Project, sources and paths
 #
 
+DEADLOCK_BOARDS   = hal/boards
+DEADLOCK_CORES    = src/cores
+DEADLOCK_MODULES  = src/modules
+DEADLOCK_FLAVOURS = src/flavours
+
+ifeq ($(wildcard $(DEADLOCK_FLAVOURS)/$(FLAVOUR)),)
+  $(error "Invalid flavour specified!")
+endif
+
+include $(DEADLOCK_FLAVOURS)/$(FLAVOUR)/makefile.in
+FLAVOURINC = $(DEADLOCK_FLAVOURS)/$(FLAVOUR)
+
 # Define project name here
 PROJECT = deadlock-reader
-BOARD   = reader-revA
-
-ifeq ($(BOARD),reader-revA)
-    BOARD_FOLDER = hal/boards/reader-revA
-    # TODO
-    # reader-revA board actually shoud have STM32F052 MCU, this is for development and
-    # not final!
-    LDSCRIPT= $(STARTUPLD)/STM32F072xB.ld
-    FW_FLASH_ADDRESS= 0x08000000
-endif
-
-ifeq ($(BOARD),reader-plus-revA)
-    BOARD_FOLDER =
-    $(error Reader Plus revA board is not yes supported!)
-    LDSCRIPT= $(STARTUPLD)/STM32F072xB.ld
-    FW_FLASH_ADDRESS= 0x08000000
-endif
-
-ifndef BOARD_FOLDER
-    $(error Incorrect board specified, fix the BOARD value!)
-endif
-
 
 # Imported source files and paths
 # Warning: order is important!
@@ -120,6 +120,8 @@ CHIBIOS = deps/ChibiOS
 UNITY = deps/Unity/src/
 FFF   = deps/fff/
 CUSTOM_HAL = hal/
+
+
 TEST_PATH = test/
 TEST_BUILD = build/test/out/
 TEST_RUNNERS = build/test/runners/
@@ -128,7 +130,11 @@ TEST_RESULTS = build/test/results/
 TEST_BUILD_PATHS = $(TEST_BUILD) $(TEST_OBJS) $(TEST_RESULTS) $(TEST_RUNNERS)
 # So that we can test both src/ and hal/
 TEST_ROOT = ./
-SOURCE = src/
+
+
+COMMON_SERVICES_SRC = src/common-services
+
+
 # Startup files.
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/startup_stm32f0xx.mk
 # HAL-OSAL files (optional).
@@ -153,7 +159,9 @@ CSRC = $(STARTUPSRC) \
        $(PLATFORMSRC) \
        $(BOARDSRC) \
        $(TESTSRC) \
-       $(shell find $(SOURCE) -type f -name '*.c')
+       $(shell find $(COMMON_SERVICES_SRC) -type f -name '*.c') \
+       $(shell find $(DEADLOCK_USED_CORE) -type f -name '*.c') \
+       $(shell for folder in $(DEADLOCK_USED_MODULES); do find $${folder} -type f -name '*.c'; done)
 
 # C test sources.
 TEST_CSRC = $(shell find $(TEST_PATH) -type f -regextype sed -regex '.*-test[0-9]*\.c')
@@ -187,7 +195,7 @@ ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-         $(CHIBIOS)/os/various \
+         $(CHIBIOS)/os/various $(FLAVOURINC) \
 
 #
 # Project, sources and paths
@@ -196,8 +204,6 @@ INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
 ##############################################################################
 # Compiler settings
 #
-
-MCU  = cortex-m0
 
 #TRGT = arm-elf-
 TRGT = arm-none-eabi-
@@ -292,7 +298,7 @@ debugl: build/deadlock-reader.elf
 	pkill st-util
 
 #
-#
+# End of helper flash and debug commands
 ###############################################################################
 
 
@@ -306,7 +312,7 @@ debugl: build/deadlock-reader.elf
 sign: build/deadlock-reader.bin.sig build/deadlock-reader.elf.sig
 
 #
-#
+# End of gpg signing helper commands
 ##############################################################################
 
 ##############################################################################
@@ -388,7 +394,7 @@ print_tcsrc:
 	echo $(TEST_CSRC)
 
 #
-#
+# End of Unit Testing with Unity rules
 ##############################################################################
 
 .PHONY: test run-tests clean-tests print_tcsrc sign
