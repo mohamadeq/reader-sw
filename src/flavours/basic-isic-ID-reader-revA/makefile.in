@@ -23,6 +23,9 @@ DEADLOCK_USED_MODULES = $(DEADLOCK_MODULES)/iso14443-3-uid-reader             \
                         $(DEADLOCK_MODULES)/reader-proto-v1                   \
                         $(DEADLOCK_MODULES)/reader-revA-ui
 
+# 10 KBytes message heap
+DEADLOCK_MSG_HEAP_SIZE = 10240
+
 
 #
 #

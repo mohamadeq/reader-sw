@@ -99,10 +99,12 @@ endif
 # Project, sources and paths
 #
 
+SOURCES_ROOT      = src
+
 DEADLOCK_BOARDS   = hal/boards
-DEADLOCK_CORES    = src/cores
-DEADLOCK_MODULES  = src/modules
-DEADLOCK_FLAVOURS = src/flavours
+DEADLOCK_CORES    = $(SOURCES_ROOT)/cores
+DEADLOCK_MODULES  = $(SOURCES_ROOT)/modules
+DEADLOCK_FLAVOURS = $(SOURCES_ROOT)/flavours
 
 ifeq ($(wildcard $(DEADLOCK_FLAVOURS)/$(FLAVOUR)),)
   $(error "Invalid flavour specified!")
@@ -132,7 +134,7 @@ TEST_BUILD_PATHS = $(TEST_BUILD) $(TEST_OBJS) $(TEST_RESULTS) $(TEST_RUNNERS)
 TEST_ROOT = ./
 
 
-COMMON_SERVICES_SRC = src/common-services
+COMMON_SERVICES_SRC = $(SOURCES_ROOT)/common-services
 
 
 # Startup files.
@@ -195,7 +197,7 @@ ASMSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
 INCDIR = $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
-         $(CHIBIOS)/os/various $(FLAVOURINC) \
+         $(CHIBIOS)/os/various $(FLAVOURINC) $(SOURCES_ROOT)
 
 #
 # Project, sources and paths
@@ -225,7 +227,7 @@ BIN  = $(CP) -O binary
 TEST_TRGT   =
 TEST_CC     = $(TEST_TRGT)gcc
 TEST_LD     = $(TEST_TRGT)gcc
-TEST_INCDIR = $(INCDIR) src/ $(FFF)
+TEST_INCDIR = $(INCDIR) $(SOURCES_ROOT) $(FFF)
 TEST_INCPARAMS = $(foreach d, $(TEST_INCDIR), -I$d)
 TEST_CFLAGS = -I. -I$(UNITY) $(TEST_INCPARAMS) -DTEST
 
@@ -255,6 +257,8 @@ ifeq ($(DEBUG_BUILD),yes)
 else
   UDEFS =
 endif
+
+UDEFS += -DDEADLOCK_MESSAGE_HEAP_SIZE=$(DEADLOCK_MSG_HEAP_SIZE)
 
 # Define ASM defines here
 ifeq ($(DEBUG_BUILD),yes)

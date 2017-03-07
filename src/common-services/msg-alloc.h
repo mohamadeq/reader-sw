@@ -32,15 +32,15 @@
 
 #include "ch.h"
 
-typedef msg_tag_t uint32_t;     /**< Type of the message tag                                      */
+typedef uint32_t msg_tag_t;     /**< Type of the message tag                                      */
 
 /**
  * Return codes of the Central Message Allocator functions
  */
 typedef enum {
-    DL_CMA_OK  = 0,             /**< The requested operation completed successfully               */
-    DL_CMA_ERR = 1,             /**< An undefined error occured during this operation             */
-    DL_CMA_OOM = 2              /**< Out-of-memory condition                                      */
+    DCS_CMA_OK  = 0,             /**< The requested operation completed successfully               */
+    DCS_CMA_ERR = 1,             /**< An undefined error occured during this operation             */
+    DCS_CMA_OOM = 2              /**< Out-of-memory condition                                      */
 } dl_cma_status;
 
 /**
@@ -49,13 +49,13 @@ typedef enum {
  * @param[in]  buf   Buffer of statically allocated memory
  * @param[in]  size  Size of the buffer
  *
- * @return     #DL_CMA_OK if CMA was initializes successfully.
- *             #DL_CMA_OOM if the buffer is too small.
- *             #DL_CMA_ERR if other error occured.
+ * @return     #DCS_CMA_OK if CMA was initializes successfully.
+ *             #DCS_CMA_OOM if the buffer is too small.
+ *             #DCS_CMA_ERR if other error occured.
  *
  * @note       This function must be called before any other CMA-related function.
  */
-dl_cma_status dlCmaInit(void *buf, size_t size);
+dl_cma_status dcsCmaInit(void *buf, size_t size);
 
 /**
  * @brief      Allocates a message.
@@ -64,38 +64,38 @@ dl_cma_status dlCmaInit(void *buf, size_t size);
  * @param[in]  msg_size           The message size
  * @param[in]  tag                The message tag
  *
- * @return     #DL_CMA_OK if the message was allocated.
- *             #DL_CMA_OOM if there is not enough memory.
- *             #DL_CMA_ERR if other error occured.
+ * @return     #DCS_CMA_OK if the message was allocated.
+ *             #DCS_CMA_OOM if there is not enough memory.
+ *             #DCS_CMA_ERR if other error occured.
  *
  * @note       This function is thread-safe.
  * @note       Message tagging is a TODO and @p tag is ignored for now.
  */
-dl_cma_status dlCmaAlloc(void *allocated_message, size_t msg_size, msg_tag_t tag);
+dl_cma_status dcsCmaAlloc(void *allocated_message, size_t msg_size, msg_tag_t tag);
 
 /**
  * @brief      Frees a message.
  *
  * @param[in]  msg   The message to free
  *
- * @return     #DL_CMA_OK if the message was freed.
- *             #DL_CMA_ERR if other error occured.
+ * @return     #DCS_CMA_OK if the message was freed.
+ *             #DCS_CMA_ERR if other error occured.
  *
  * @note       This function is thread-safe.
  */
-dl_cma_status dlCmaFree(void* msg);
+dl_cma_status dcsCmaFree(void* msg);
 
 /**
  * @brief      Frees all messages tagged with @p tag
  *
  * @param[in]  tag   The tag
  *
- * @return     #DL_CMA_ERR, since this function is not yet implemented.
+ * @return     #DCS_CMA_ERR, since this function is not yet implemented.
  *
  * @note       This function is thread-safe.
  * @note       This function is not yet implemented and is a no-op.
  * @note       But it is a thread-safe no-op.
  */
-dl_cma_status dlCmaFreeAll(msg_tag_t tag);
+dl_cma_status dcsCmaFreeAll(msg_tag_t tag);
 
 #endif
